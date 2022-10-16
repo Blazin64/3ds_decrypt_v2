@@ -177,7 +177,7 @@ with open(argv[1], 'rb') as f:
                                                         exefsctrmode.decrypt(f.read(1024 * 1024))))
                                                     print(
                                                         "\rPartition %1d ExeFS: Decrypting: %8s... %4d / %4d mb..." %
-                                                        (p, str(exefs_filename[0]), i, datalenM + 1)),
+                                                        (p, str(exefs_filename[0]), i, datalenM + 1), end=""),
                                             if (datalenB > 0):
                                                 g.write(exefsctrmode2C.encrypt(exefsctrmode.decrypt(f.read(datalenB))))
                                             print(
@@ -196,7 +196,7 @@ with open(argv[1], 'rb') as f:
                                     for i in range(exefsSizeM):
                                         g.write(exefsctrmode2C.decrypt(f.read(1024 * 1024)))
                                         print("\rPartition %1d ExeFS: Decrypting: %4d / %4d mb" %
-                                              (p, i, exefsSizeM + 1)),
+                                              (p, i, exefsSizeM + 1), end=""),
                                 if (exefsSizeB > 0):
                                     g.write(exefsctrmode2C.decrypt(f.read(exefsSizeB)))
                                 print("\rPartition %1d ExeFS: Decrypting: %4d / %4d mb... Done" %
@@ -218,7 +218,7 @@ with open(argv[1], 'rb') as f:
                                     for i in range(romfsSizeM):
                                         g.write(romfsctrmode.decrypt(f.read(1024 * 1024)))
                                         print("\rPartition %1d RomFS: Decrypting: %4d / %4d mb" %
-                                              (p, i, romfsSizeM + 1)),
+                                              (p, i, romfsSizeM + 1), end=""),
                                 if (romfsSizeB > 0):
                                     g.write(romfsctrmode.decrypt(f.read(romfsSizeB)))
 

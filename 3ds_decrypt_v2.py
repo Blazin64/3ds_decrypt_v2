@@ -161,9 +161,9 @@ with open(argv[1], 'rb') as f:
                                         if exefs_filename[0] == b'.code\x00\x00\x00':
                                             code_fileoff = struct.unpack('<L', g.read(0x04))
                                             code_filelen = struct.unpack('<L', g.read(0x04))
-                                            datalenM = ((code_filelen[0]) / (1024 * 1024))
+                                            datalenM = int((code_filelen[0]) / (1024 * 1024))
                                             datalenB = ((code_filelen[0]) % (1024 * 1024))
-                                            ctroffset = ((code_fileoff[0] + sectorsize) / 0x10)
+                                            ctroffset = int((code_fileoff[0] + sectorsize) / 0x10)
                                             exefsctr = Counter.new(128, initial_value=(exefsIV + ctroffset))
                                             exefsctr2C = Counter.new(128, initial_value=(exefsIV + ctroffset))
                                             exefsctrmode = AES.new(to_bytes(NormalKey), AES.MODE_CTR, counter=exefsctr)
@@ -185,9 +185,9 @@ with open(argv[1], 'rb') as f:
                                                 (p, str(exefs_filename[0]), datalenM + 1, datalenM + 1))
 
                                 # decrypt exefs
-                                exefsSizeM = ((exefs_len[0] - 1) * sectorsize) / (1024 * 1024)
+                                exefsSizeM = int(((exefs_len[0] - 1) * sectorsize) / (1024 * 1024))
                                 exefsSizeB = ((exefs_len[0] - 1) * sectorsize) % (1024 * 1024)
-                                ctroffset = (sectorsize / 0x10)
+                                ctroffset = int(sectorsize / 0x10)
                                 exefsctr2C = Counter.new(128, initial_value=(exefsIV + ctroffset))
                                 exefsctrmode2C = AES.new(to_bytes(NormalKey2C), AES.MODE_CTR, counter=exefsctr2C)
                                 f.seek((part_off[0] + exefs_off[0] + 1) * sectorsize)
@@ -206,7 +206,7 @@ with open(argv[1], 'rb') as f:
                                 print("Partition %1d ExeFS: No Data... Skipping..." % p)
 
                             if (romfs_off[0] != 0):
-                                romfsSizeM = (romfs_len[0] * sectorsize) / (1024 * 1024)
+                                romfsSizeM = int((romfs_len[0] * sectorsize) / (1024 * 1024))
                                 romfsSizeB = (romfs_len[0] * sectorsize) % (1024 * 1024)
 
                                 romfsctr = Counter.new(128, initial_value=romfsIV)

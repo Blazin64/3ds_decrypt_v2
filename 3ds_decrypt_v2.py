@@ -59,7 +59,7 @@ with open(argv[1], 'rb') as f:
                 partition_flags = struct.unpack('<BBBBBBBB', f.read(0x8))
 
                 if (partition_flags[7] & 0x04):  # check if the 'NoCrypto' bit (bit 3) is set
-                    print("Partition %1d: Already Decrypted?..." % p)
+                    print(f"Partition {p}: Already Decrypted?...")
                 else:
                     if (part_off[0] * sectorsize) > 0:  # check if partition exists
 
@@ -138,7 +138,7 @@ with open(argv[1], 'rb') as f:
                                 exhdr_filelen = 0x800
                                 exefsctr2C = Counter.new(128, initial_value=(plainIV))
                                 exefsctrmode2C = AES.new(to_bytes(NormalKey2C), AES.MODE_CTR, counter=exefsctr2C)
-                                print("Partition %1d ExeFS: Decrypting: ExHeader" % p)
+                                print(f"Partition {p} ExeFS: Decrypting: ExHeader")
                                 g.write(exefsctrmode2C.decrypt(f.read(exhdr_filelen)))
 
                             if (exefs_len[0] > 0):
@@ -148,7 +148,7 @@ with open(argv[1], 'rb') as f:
                                 exefsctr2C = Counter.new(128, initial_value=(exefsIV))
                                 exefsctrmode2C = AES.new(to_bytes(NormalKey2C), AES.MODE_CTR, counter=exefsctr2C)
                                 g.write(exefsctrmode2C.decrypt(f.read(sectorsize)))
-                                print("Partition %1d ExeFS: Decrypting: ExeFS Filename Table" % p)
+                                print(f"Partition {p} ExeFS: Decrypting: ExeFS Filename Table")
 
                                 if (partition_flags[3] == 0x01 or partition_flags[3] == 0x0A or partition_flags[
                                     3] == 0x0B):
@@ -176,13 +176,11 @@ with open(argv[1], 'rb') as f:
                                                     g.write(exefsctrmode2C.encrypt(
                                                         exefsctrmode.decrypt(f.read(1024 * 1024))))
                                                     print(
-                                                        "\rPartition %1d ExeFS: Decrypting: %8s... %4d / %4d mb..." %
-                                                        (p, str(exefs_filename[0]), i, datalenM + 1), end=""),
+                                                        f"\rPartition {p} ExeFS: Decrypting: {str(exefs_filename[0]):8s}... {i:4d} / {datalenM + 1:4d} mb...", end=""),
                                             if (datalenB > 0):
                                                 g.write(exefsctrmode2C.encrypt(exefsctrmode.decrypt(f.read(datalenB))))
                                             print(
-                                                "\rPartition %1d ExeFS: Decrypting: %8s... %4d / %4d mb... Done!" %
-                                                (p, str(exefs_filename[0]), datalenM + 1, datalenM + 1))
+                                                f"\rPartition {p} ExeFS: Decrypting: {str(exefs_filename[0]):8s}... {datalenM + 1:4d} / {datalenM + 1:4d} mb... Done!")
 
                                 # decrypt exefs
                                 exefsSizeM = int(((exefs_len[0] - 1) * sectorsize) / (1024 * 1024))
@@ -195,15 +193,13 @@ with open(argv[1], 'rb') as f:
                                 if (exefsSizeM > 0):
                                     for i in range(exefsSizeM):
                                         g.write(exefsctrmode2C.decrypt(f.read(1024 * 1024)))
-                                        print("\rPartition %1d ExeFS: Decrypting: %4d / %4d mb" %
-                                              (p, i, exefsSizeM + 1), end=""),
+                                        print(f"\rPartition {p} ExeFS: Decrypting: {i:4d} / {exefsSizeM + 1:4d} mb", end=""),
                                 if (exefsSizeB > 0):
                                     g.write(exefsctrmode2C.decrypt(f.read(exefsSizeB)))
-                                print("\rPartition %1d ExeFS: Decrypting: %4d / %4d mb... Done" %
-                                      (p, exefsSizeM + 1, exefsSizeM + 1))
+                                print(f"\rPartition {p} ExeFS: Decrypting: {exefsSizeM + 1:4d} / {exefsSizeM + 1:4d} mb... Done")
 
                             else:
-                                print("Partition %1d ExeFS: No Data... Skipping..." % p)
+                                print(f"Partition {p} ExeFS: No Data... Skipping...")
 
                             if (romfs_off[0] != 0):
                                 romfsSizeM = int((romfs_len[0] * sectorsize) / (1024 * 1024))
@@ -217,16 +213,14 @@ with open(argv[1], 'rb') as f:
                                 if (romfsSizeM > 0):
                                     for i in range(romfsSizeM):
                                         g.write(romfsctrmode.decrypt(f.read(1024 * 1024)))
-                                        print("\rPartition %1d RomFS: Decrypting: %4d / %4d mb" %
-                                              (p, i, romfsSizeM + 1), end=""),
+                                        print(f"\rPartition {p} RomFS: Decrypting: {i:4d} / {romfsSizeM + 1:4d} mb", end=""),
                                 if (romfsSizeB > 0):
                                     g.write(romfsctrmode.decrypt(f.read(romfsSizeB)))
 
-                                print("\rPartition %1d RomFS: Decrypting: %4d / %4d mb... Done" %
-                                      (p, romfsSizeM + 1, romfsSizeM + 1))
+                                print(f"\rPartition {p} RomFS: Decrypting: {romfsSizeM + 1:4d} / {romfsSizeM + 1:4d} mb... Done")
 
                             else:
-                                print("Partition %1d RomFS: No Data... Skipping..." % p)
+                                print(f"Partition {p} RomFS: No Data... Skipping...")
 
                             g.seek((part_off[0] * sectorsize) + 0x18B)
                             g.write(struct.pack('<B', int(0x00)))  # set crypto-method to 0x00
@@ -237,9 +231,9 @@ with open(argv[1], 'rb') as f:
                             flag = (flag | 0x04)  # turn on 0x04 = NoCrypto
                             g.write(struct.pack('<B', int(flag)))  # write flag
                         else:
-                            print("Partition %1d Unable to read NCCH header" % p)
+                            print(f"Partition {p} Unable to read NCCH header")
                     else:
-                        print("Partition %1d Not found... Skipping..." % p)
+                        print(f"Partition {p} Not found... Skipping...")
             print("Done...")
         else:
             print("Error: Not a 3DS Rom?")
